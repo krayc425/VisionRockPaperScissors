@@ -9,7 +9,8 @@ import SwiftUI
 
 struct MainView: View {
 
-  @Environment(\.openWindow) var openWindow
+  @State private var showHandAlignmentView: Bool = false
+  @State private var showSinglePlayerView: Bool = false
 
   var body: some View {
     VStack(alignment: .center) {
@@ -19,19 +20,25 @@ struct MainView: View {
       Spacer(minLength: 24.0)
       Button {
         if HandDistanceManager.shared.hasResults {
-          openWindow(id: WindowIdentifiers.singlePlayer.rawValue)
+          showSinglePlayerView = true
         } else {
-          openWindow(id: WindowIdentifiers.handAlignment.rawValue)
+          showHandAlignmentView = true
         }
       } label: {
         Text("Start")
       }
       Button {
-        openWindow(id: WindowIdentifiers.handAlignment.rawValue)
+        showHandAlignmentView = true
       } label: {
         Text("Hand alignment")
       }
       Spacer()
+    }
+    .fullScreenCover(isPresented: $showSinglePlayerView) {
+      SinglePlayerView()
+    }
+    .fullScreenCover(isPresented: $showHandAlignmentView) {
+      HandAlignmentView()
     }
   }
 

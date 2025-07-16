@@ -11,7 +11,7 @@ struct HandAlignmentView: View {
 
   @Environment(\.openImmersiveSpace) private var openImmersiveSpace
   @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
-  @Environment(\.dismissWindow) private var dismissWindow
+  @Environment(\.dismiss) private var dismiss
   @StateObject private var viewModel = HandTrackingResultViewModel()
   @StateObject private var distanceManager = HandDistanceManager.shared
   @State private var isImmersiveSpacePresented: Bool = false
@@ -32,13 +32,14 @@ struct HandAlignmentView: View {
         distanceManager.save()
         Task {
           await dismissImmersiveSpace()
-          dismissWindow(id: WindowIdentifiers.handAlignment.rawValue)
+          dismiss()
         }
       } label: {
         Text("Done")
       }
       .disabled(!distanceManager.hasResults)
     }
+    .frame(width: 600.0, height: 600.0)
     .onChange(of: viewModel.leftResult) { _, newValue in
       if let newValue {
         distanceManager.updateLeftAlignmentResult(newValue)

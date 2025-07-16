@@ -7,12 +7,6 @@
 
 import Foundation
 
-enum WindowIdentifiers: String {
-  case main
-  case handAlignment
-  case singlePlayer
-}
-
 enum ImmersiveSpaceIdentifiers: String {
   case handTracking
 }

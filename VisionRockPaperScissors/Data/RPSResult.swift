@@ -7,6 +7,10 @@
 
 import Foundation
 
+enum GameOutcome {
+  case win, lose, draw
+}
+
 enum RPSResult: CaseIterable {
 
   case rock
@@ -22,6 +26,24 @@ enum RPSResult: CaseIterable {
       case .scissor:
         return "✌️"
     }
+  }
+
+  func beats(_ other: RPSResult) -> Bool {
+    switch (self, other) {
+      case (.rock, .scissor),
+        (.scissor, .paper),
+        (.paper, .rock):
+        return true
+      default:
+        return false
+    }
+  }
+
+  func compare(to other: RPSResult) -> GameOutcome {
+    if self == other {
+      return .draw
+    }
+    return self.beats(other) ? .win : .lose
   }
 
 }
