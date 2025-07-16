@@ -10,12 +10,19 @@ import SwiftUI
 @main
 struct VisionRockPaperScissorsApp: App {
   var body: some Scene {
-    WindowGroup {
+    WindowGroup(id: WindowIdentifiers.main.rawValue) {
       MainView()
     }
-
-    // The immersive space that defines `HeadPositionView`.
-    ImmersiveSpace(id: "HandTrackingScene") {
+    .defaultSize(width: 400.0, height: 400.0)
+    WindowGroup(id: WindowIdentifiers.handAlignment.rawValue) {
+      HandAlignmentView()
+    }
+    .defaultSize(width: 600.0, height: 400.0)
+    WindowGroup(id: WindowIdentifiers.singlePlayer.rawValue) {
+      SinglePlayerView()
+    }
+    .defaultSize(width: 800.0, height: 800.0)
+    ImmersiveSpace(id: ImmersiveSpaceIdentifiers.handTracking.rawValue) {
       HandTrackingView()
     }
   }
