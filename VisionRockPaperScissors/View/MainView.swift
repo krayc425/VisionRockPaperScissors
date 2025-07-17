@@ -9,13 +9,15 @@ import SwiftUI
 
 struct MainView: View {
 
-  @State private var showHandAlignmentView: Bool = false
   @State private var showSinglePlayerView: Bool = false
+  @State private var showHandAlignmentView: Bool = false
+  @State private var showSettingsView: Bool = false
+  @AppStorage(UserDefaultsKeys.selectedSkintone.rawValue) private var selectedToneRawValue: String = ""
 
   var body: some View {
     VStack(alignment: .center) {
       Spacer()
-      Text(RPSResult.allCases.map { $0.emoji }.joined())
+      Text(RPSResult.makeAllCasesPreview(SkinTone(rawValue: selectedToneRawValue)))
         .font(.largeTitle)
       Spacer(minLength: 24.0)
       Button {
@@ -28,9 +30,9 @@ struct MainView: View {
         Text("Start")
       }
       Button {
-        showHandAlignmentView = true
+        showSettingsView = true
       } label: {
-        Text("Hand alignment")
+        Text("Settings")
       }
       Spacer()
     }
@@ -39,6 +41,9 @@ struct MainView: View {
     }
     .fullScreenCover(isPresented: $showHandAlignmentView) {
       HandAlignmentView()
+    }
+    .fullScreenCover(isPresented: $showSettingsView) {
+      SettingsView()
     }
   }
 

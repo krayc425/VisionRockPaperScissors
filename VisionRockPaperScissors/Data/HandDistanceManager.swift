@@ -13,17 +13,25 @@ class HandDistanceManager: ObservableObject {
 
   static let shared = HandDistanceManager()
   private let userDefaults = UserDefaults.standard
-
-  @Published var latestLeftDistances: HandDistances = []
-  @Published var latestRightDistances: HandDistances = []
+  private static let emptyArray: HandDistances = [0, 0, 0, 0, 0]
+  @Published var latestLeftDistances: HandDistances = [0, 0, 0, 0, 0]
+  @Published var latestRightDistances: HandDistances = [0, 0, 0, 0, 0]
 
   var hasResults: Bool {
-    return (latestLeftDistances + latestRightDistances).filter({ $0 == 0.0 }).isEmpty 
+    return (latestLeftDistances + latestRightDistances).filter({ $0 == 0.0 }).isEmpty
   }
 
   private init() {
-    latestLeftDistances = (userDefaults.array(forKey: UserDefaultsKeys.latestLeftDistance.rawValue) as? HandDistances) ?? [0,0,0,0,0]
-    latestRightDistances = (userDefaults.array(forKey: UserDefaultsKeys.latestRightDistance.rawValue) as? HandDistances) ?? [0,0,0,0,0]
+    latestLeftDistances = if let leftDistance = userDefaults.array(forKey: UserDefaultsKeys.latestLeftDistance.rawValue) as? HandDistances, !leftDistance.isEmpty {
+      leftDistance
+    } else {
+      Self.emptyArray
+    }
+    latestRightDistances = if let rightDistance = userDefaults.array(forKey: UserDefaultsKeys.latestRightDistance.rawValue) as? HandDistances, !rightDistance.isEmpty {
+      rightDistance
+    } else {
+      Self.emptyArray
+    }
   }
 
   func updateLeftAlignmentResult(_ result: HandTrackingResult) {
@@ -32,6 +40,13 @@ class HandDistanceManager: ObservableObject {
 
   func updateRightAlignmentResult(_ result: HandTrackingResult) {
     latestRightDistances = zip(latestRightDistances, result.distances).map { max($0, $1) }
+  }
+
+  func reset() {
+    latestLeftDistances = Self.emptyArray
+    latestRightDistances = Self.emptyArray
+    userDefaults.removeObject(forKey: UserDefaultsKeys.latestLeftDistance.rawValue)
+    userDefaults.removeObject(forKey: UserDefaultsKeys.latestRightDistance.rawValue)
   }
 
   func save() {

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GameHistoryView: View {
 
+  @AppStorage(UserDefaultsKeys.selectedSkintone.rawValue) private var selectedToneRawValue: String = ""
   @Environment(\.dismiss) private var dismiss
   let history: [GameResult]
 
@@ -16,11 +17,12 @@ struct GameHistoryView: View {
     NavigationStack {
       List(history.reversed()) { history in
         HStack {
-          Text(history.player.emoji)
+          Text(history.player.applySkintone(SkinTone(rawValue: selectedToneRawValue)))
           Spacer()
-          Text(history.opponent.emoji)
+          Text(history.opponent.applySkintone(SkinTone(rawValue: selectedToneRawValue)))
         }
       }
+      .navigationTitle("History")
       .toolbar {
         Button {
           dismiss()

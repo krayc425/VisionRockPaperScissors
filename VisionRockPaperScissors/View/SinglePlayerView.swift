@@ -10,6 +10,8 @@ import SwiftUI
 
 struct SinglePlayerView: View {
 
+  @AppStorage(UserDefaultsKeys.selectedSkintone.rawValue) private var selectedToneRawValue: String = ""
+  @AppStorage(UserDefaultsKeys.preferredHand.rawValue) private var preferredHandRawValue: String = ""
   @Environment(\.openImmersiveSpace) private var openImmersiveSpace
   @Environment(\.dismissImmersiveSpace) private var dismissImmersiveSpace
   @Environment(\.dismiss) private var dismiss
@@ -17,28 +19,38 @@ struct SinglePlayerView: View {
   @StateObject private var gameViewModel = GameViewModel()
   @State private var isImmersiveSpacePresented: Bool = false
   @State private var showHistoryView: Bool = false
+
   private var recognizer = RPSRecognizer()
+  private var handTrackingPublisher: AnyPublisher<HandTrackingResult?, Never> {
+    let handChirality = HandChirality(rawValue: preferredHandRawValue) ?? .right
+    switch handChirality {
+      case .left:
+        return handTrackingViewModel.$leftResult.eraseToAnyPublisher()
+      case .right:
+        return handTrackingViewModel.$rightResult.eraseToAnyPublisher()
+    }
+  }
 
   var body: some View {
     Group {
       switch gameViewModel.status {
-          case .countdown(let value):
+        case .countdown(let value):
           if value == 0 {
             Text("Show your hand!")
               .font(.largeTitle)
               .onAppear {
-                gameViewModel.subscribe(handTrackingViewModel.$rightResult.eraseToAnyPublisher())
+                gameViewModel.subscribe(handTrackingPublisher)
               }
           } else {
-            Text("Countdown... \(value)")
+            Text("\(value)")
               .font(.largeTitle)
           }
         case .result(let result):
           VStack {
             Spacer()
-            Text("You: \(result.player.emoji)")
+            Text("You: \(result.player.applySkintone(SkinTone(rawValue: selectedToneRawValue)))")
               .font(.largeTitle)
-            Text("Opponent: \(result.opponent.emoji)")
+            Text("Opponent: \(result.opponent.applySkintone(SkinTone(rawValue: selectedToneRawValue)))")
               .font(.largeTitle)
             Button {
               gameViewModel.restart()
@@ -80,9 +92,12 @@ struct SinglePlayerView: View {
     }
     .onAppear {
       Task {
-        await openImmersiveSpace(id: ImmersiveSpaceIdentifiers.handTracking.rawValue)
-        isImmersiveSpacePresented = true
-        gameViewModel.startCountdown()
+        let result = await openImmersiveSpace(id: "singleplayer")
+        if result == .opened {
+          isImmersiveSpacePresented = true
+          gameViewModel.startCountdown()
+          debugPrint("ImmersiveSpace opened")
+        }
       }
     }
     .onDisappear {

@@ -5,13 +5,6 @@
 //  Created by Kuixi Song on 7/15/25.
 //
 
-enum HandChirality: Equatable {
-
-  case left
-  case right
-
-}
-
 struct HandTrackingResult: Equatable {
 
   let chirality: HandChirality

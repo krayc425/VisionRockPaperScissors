@@ -29,7 +29,6 @@ struct HandTrackingSystem: System {
   @MainActor
   static func runSession() async {
     do {
-      // Attempt to run the ARKit session with the hand-tracking provider.
       try await arSession.run([handTracking])
     } catch let error as ARKitSession.Error {
       debugPrint("The app has encountered an error while running providers: \(error.localizedDescription)")
@@ -37,9 +36,7 @@ struct HandTrackingSystem: System {
       debugPrint("The app has encountered an unexpected error: \(error.localizedDescription)")
     }
 
-    // Start to collect each hand-tracking anchor.
     for await anchorUpdate in handTracking.anchorUpdates {
-      // Check whether the anchor is on the left or right hand.
       switch anchorUpdate.anchor.chirality {
         case .left:
           self.latestLeftHand = anchorUpdate.anchor

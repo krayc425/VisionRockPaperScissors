@@ -20,12 +20,16 @@ enum RPSResult: CaseIterable {
   var emoji: String {
     switch self {
       case .rock:
-        return "✊"
+        return "👊"
       case .paper:
         return "🖐"
       case .scissor:
         return "✌️"
     }
+  }
+
+  func applySkintone(_ skintone: SkinTone?) -> String {
+    return emoji + (skintone ?? .none).rawValue
   }
 
   func beats(_ other: RPSResult) -> Bool {
@@ -44,6 +48,10 @@ enum RPSResult: CaseIterable {
       return .draw
     }
     return self.beats(other) ? .win : .lose
+  }
+
+  static func makeAllCasesPreview(_ skintone: SkinTone?) -> String {
+    return RPSResult.allCases.map { $0.applySkintone(skintone) }.joined()
   }
 
 }
