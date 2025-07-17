@@ -43,21 +43,25 @@ struct SinglePlayerView: View {
               }
           } else {
             Text("\(value)")
-              .font(.largeTitle)
+              .font(.extraLargeTitle)
           }
         case .result(let result):
-          VStack {
+          HStack {
             Spacer()
-            Text("You: \(result.player.applySkintone(SkinTone(rawValue: selectedToneRawValue)))")
-              .font(.largeTitle)
-            Text("Opponent: \(result.opponent.applySkintone(SkinTone(rawValue: selectedToneRawValue)))")
-              .font(.largeTitle)
+            Text("\(result.player.applySkintone(SkinTone(rawValue: selectedToneRawValue)))")
+              .font(.extraLargeTitle)
+            Spacer()
+            Text("\(result.opponent.applySkintone(SkinTone(rawValue: selectedToneRawValue)))")
+              .font(.extraLargeTitle)
+            Spacer()
+          }
+          .overlay(alignment: .bottom) {
             Button {
               gameViewModel.restart()
             } label: {
               Text("Play again")
             }
-            Spacer()
+            .padding()
           }
       }
     }
@@ -71,9 +75,7 @@ struct SinglePlayerView: View {
     .overlay(alignment: .topLeading) {
       Button {
         gameViewModel.reset()
-        Task {
-          dismiss()
-        }
+        dismiss()
       } label: {
         Image(systemName: "xmark")
       }

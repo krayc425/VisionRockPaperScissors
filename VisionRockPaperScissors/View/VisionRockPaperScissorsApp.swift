@@ -16,7 +16,7 @@ struct VisionRockPaperScissorsApp: App {
     }
     .defaultSize(width: 600.0, height: 600.0)
     .windowResizability(.contentSize)
-    ImmersiveSpace(id: "hangalignment") {
+    ImmersiveSpace(id: "handalignment") {
       HandTrackingView()
     }
     ImmersiveSpace(id: "singleplayer") {

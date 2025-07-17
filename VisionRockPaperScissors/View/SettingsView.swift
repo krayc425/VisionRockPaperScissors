@@ -5,6 +5,7 @@
 //  Created by Kuixi Song on 7/16/25.
 //
 
+import ARKit
 import SwiftUI
 
 struct SettingsView: View {
@@ -37,6 +38,7 @@ struct SettingsView: View {
           } label: {
             Text("Hand Alignment")
           }
+          .disabled(!HandTrackingProvider.isSupported)
           Picker("Skin Tone", selection: selectedSkintone) {
             ForEach(SkinTone.allCases) { tone in
               Text(tone.preview).tag(tone)

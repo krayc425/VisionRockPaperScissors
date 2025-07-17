@@ -17,6 +17,7 @@ struct HandAlignmentView: View {
   @StateObject private var distanceManager = HandDistanceManager.shared
   @State private var isImmersiveSpacePresented: Bool = false
   @State private var showResetAlert: Bool = false
+  @State private var showAuthorizationAlert: Bool = false
 
   var body: some View {
     VStack(spacing: 8.0) {
@@ -33,25 +34,31 @@ struct HandAlignmentView: View {
     }
     .frame(width: 600.0, height: 600.0)
     .overlay(alignment: .topLeading) {
-      Button(role: .destructive) {
-        showResetAlert = true
+      Button {
+        dismiss()
       } label: {
-        Text("Reset")
+        Image(systemName: "xmark")
       }
       .padding()
     }
     .overlay(alignment: .topTrailing) {
       Button {
         distanceManager.save()
-        Task {
-          await dismissImmersiveSpace()
-          dismiss()
-        }
+        dismiss()
       } label: {
         Text("Done")
       }
       .disabled(!distanceManager.hasResults)
       .padding()
+    }
+    .overlay(alignment: .bottom) {
+      Button(role: .destructive) {
+        showResetAlert = true
+      } label: {
+        Text("Reset")
+      }
+      .padding()
+      .disabled(!distanceManager.hasResults)
     }
     .alert("Are you sure to reset hand alignment data?", isPresented: $showResetAlert) {
       Button(role: .destructive) {
@@ -60,19 +67,34 @@ struct HandAlignmentView: View {
         Text("Reset")
       }
     }
-    .onChange(of: viewModel.leftResult) { _, newValue in
+    .alert("Please go to System Settings and allow hand tracking for RockPaperScissors", isPresented: $showAuthorizationAlert) {
+      Button("Open Settings") {
+        if let url = URL(string: UIApplication.openSettingsURLString), UIApplication.shared.canOpenURL(url) {
+          UIApplication.shared.open(url)
+        }
+      }
+      Button("Dismiss") {
+        dismiss()
+      }
+    }
+    .onChange(of: viewModel.leftResult, initial: true) { _, newValue in
       if let newValue {
         distanceManager.updateLeftAlignmentResult(newValue)
       }
     }
-    .onChange(of: viewModel.rightResult) { _, newValue in
+    .onChange(of: viewModel.rightResult, initial: true) { _, newValue in
       if let newValue {
         distanceManager.updateRightAlignmentResult(newValue)
       }
     }
+    .onChange(of: viewModel.isAuthorized, initial: true) { _, newValue in
+      if !newValue {
+        showAuthorizationAlert = true
+      }
+    }
     .onAppear {
       Task {
-        await openImmersiveSpace(id: "hangalignment")
+        await openImmersiveSpace(id: "handalignment")
         isImmersiveSpacePresented = true
       }
     }
