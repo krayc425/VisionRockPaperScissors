@@ -28,6 +28,9 @@ struct HandTrackingSystem: System {
 
   @MainActor
   static func runSession() async {
+    guard HandTrackingProvider.isSupported else {
+      return
+    }
     do {
       try await arSession.run([handTracking])
     } catch let error as ARKitSession.Error {
@@ -35,7 +38,6 @@ struct HandTrackingSystem: System {
     } catch let error {
       debugPrint("The app has encountered an unexpected error: \(error.localizedDescription)")
     }
-
     for await anchorUpdate in handTracking.anchorUpdates {
       switch anchorUpdate.anchor.chirality {
         case .left:
