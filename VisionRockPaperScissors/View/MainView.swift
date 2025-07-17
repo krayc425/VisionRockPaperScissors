@@ -15,11 +15,13 @@ struct MainView: View {
   @AppStorage(UserDefaultsKeys.selectedSkintone.rawValue) private var selectedToneRawValue: String = ""
 
   var body: some View {
-    VStack(alignment: .center) {
+    VStack(alignment: .center, spacing: 24.0) {
       Spacer()
+      Text("Rock. Paper. Scissors.")
+        .font(.extraLargeTitle)
       Text(RPSResult.makeAllCasesPreview(SkinTone(rawValue: selectedToneRawValue)))
         .font(.largeTitle)
-      Spacer(minLength: 24.0)
+      Spacer()
       Button {
         if HandDistanceManager.shared.hasResults {
           showSinglePlayerView = true
@@ -32,7 +34,7 @@ struct MainView: View {
       Button {
         showSettingsView = true
       } label: {
-        Text("Settings")
+        Label("Settings", systemImage: "gear")
       }
       Spacer()
     }
@@ -47,4 +49,9 @@ struct MainView: View {
     }
   }
 
+}
+
+#Preview {
+  MainView()
+    .frame(width: 600.0, height: 600.0)
 }
